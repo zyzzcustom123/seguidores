@@ -16,7 +16,10 @@
   font-family:Arial,sans-serif;position:relative
 }
 @media(prefers-color-scheme:dark){
-  .zyzz-page{--bg:#000;--text:#fff;--muted:#222;--muted-border:#555;--primary:#e31b23;--primary-hover:#b2171d}
+  .zyzz-page{
+    --bg:#000;--text:#fff;--muted:#222;--muted-border:#555;
+    --primary:#e31b23;--primary-hover:#b2171d
+  }
 }
 #zyzz-particles{position:absolute;inset:0}
 .container{
@@ -29,7 +32,8 @@ input,button{
 }
 input{background:var(--muted);border:1px solid var(--muted-border)}
 button{
-  background:var(--primary);color:#fff;border:none;font-weight:bold;cursor:pointer
+  background:var(--primary);color:#fff;border:none;
+  font-weight:bold;cursor:pointer
 }
 button:hover{background:var(--primary-hover)}
 </style>
@@ -37,30 +41,35 @@ button:hover{background:var(--primary-hover)}
 
 <body>
 <div class="zyzz-page">
-<div id="zyzz-particles"></div>
+  <div id="zyzz-particles"></div>
 
-<div class="container">
-<h1 id="tituloAnimado"></h1>
+  <div class="container">
+    <h1 id="tituloAnimado"></h1>
 
-<input id="tituloInput" placeholder="Digite o título">
-<input id="canalLinkInput" placeholder="Link da página">
-<input id="downloadLinkInput" placeholder="Link do download">
+    <input id="tituloInput" placeholder="Digite o título">
+    <input id="canalLinkInput" placeholder="Link da página">
+    <input id="downloadLinkInput" placeholder="Link do download">
 
-<button onclick="gerarLink()">Gerar URL Curta ✅</button>
-</div>
+    <button onclick="gerarLink()">Gerar URL Curta ✅</button>
+  </div>
 </div>
 
 <script>
-// ⚠️ COLOQUE ISSO EM BACKEND NO FUTURO
+// 🔑 SUA API DO TINYURL (como você pediu)
 const TINYURL_API_TOKEN = "2zYuBCZsmnRmtpGCXLG1RBVv0R6IxCv3kKbaORqJP3rAonEw1q86SPY3wpM8";
 
-const texto="Ganhe Seguidores redes social";
-let i=0,apag=false;
+// Título animado
+const texto = "Ganhe Seguidores redes social";
+let i = 0, apag = false;
 function animar(){
-  tituloAnimado.textContent=texto.slice(0,i);
-  if(!apag&&i<texto.length){i++;setTimeout(animar,120)}
-  else if(apag&&i>0){i--;setTimeout(animar,80)}
-  else{apag=!apag;setTimeout(animar,800)}
+  tituloAnimado.textContent = texto.slice(0, i);
+  if(!apag && i < texto.length){
+    i++; setTimeout(animar, 120);
+  } else if(apag && i > 0){
+    i--; setTimeout(animar, 80);
+  } else {
+    apag = !apag; setTimeout(animar, 800);
+  }
 }
 animar();
 
@@ -75,19 +84,20 @@ async function gerarLink(){
   }
 
   const urlLonga =
-    location.origin + location.pathname.replace("index.html","") +
-    "concluir.html?titulo="+encodeURIComponent(t)+
-    "&canalLink="+encodeURIComponent(c)+
-    "&downloadLink="+encodeURIComponent(d);
+    location.origin +
+    location.pathname.replace("index.html","") +
+    "concluir.html?titulo=" + encodeURIComponent(t) +
+    "&canalLink=" + encodeURIComponent(c) +
+    "&downloadLink=" + encodeURIComponent(d);
 
   try{
-    const resp = await fetch("https://api.tinyurl.com/create",{
-      method:"POST",
-      headers:{
-        "Authorization":"Bearer " + TINYURL_API_TOKEN,
-        "Content-Type":"application/json"
+    const resp = await fetch("https://api.tinyurl.com/create", {
+      method: "POST",
+      headers: {
+        "Authorization": "Bearer " + TINYURL_API_TOKEN,
+        "Content-Type": "application/json"
       },
-      body:JSON.stringify({
+      body: JSON.stringify({
         url: urlLonga,
         domain: "tinyurl.com"
       })
@@ -96,22 +106,26 @@ async function gerarLink(){
     const data = await resp.json();
 
     if(!data.data || !data.data.tiny_url){
-      throw "Erro ao encurtar";
+      alert("Erro ao encurtar link");
+      return;
     }
 
     navigator.clipboard.writeText(data.data.tiny_url);
-    alert("Link curto copiado:\n" + data.data.tiny_url);
+    alert("✅ Link curto copiado:\n\n" + data.data.tiny_url);
 
-  }catch(e){
-    console.error(e);
-    alert("Erro ao gerar link curto");
+  }catch(err){
+    console.error(err);
+    alert("Erro na API do TinyURL");
   }
 }
 
 particlesJS("zyzz-particles",{
-  particles:{number:{value:80},color:{value:"#e31b23"},
-  line_linked:{enable:true,color:"#e31b23"},
-  move:{enable:true,speed:2}}
+  particles:{
+    number:{value:80},
+    color:{value:"#e31b23"},
+    line_linked:{enable:true,color:"#e31b23"},
+    move:{enable:true,speed:2}
+  }
 });
 </script>
 </body>
