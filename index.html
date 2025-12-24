@@ -11,7 +11,7 @@
 :root { color-scheme: light dark; }
 .zyzz-page{
   --bg:#fff;--text:#111;--muted:#f5f5f7;--muted-border:#d0d0d0;
-  --primary:#0d6efd;--primary-hover:#0b5ed7;--accent:#e31b23;
+  --primary:#0d6efd;--primary-hover:#0b5ed7;
   min-height:100vh;padding:60px 16px;background:var(--bg);color:var(--text);
   font-family:Arial,sans-serif;position:relative
 }
@@ -71,8 +71,8 @@ function animar(){
 }
 animar();
 
-// GERAR LINK + ENCURTAR (is.gd – funciona no GitHub Pages)
-async function gerarLink(){
+// GERAR LINK SEM CORS (is.gd)
+function gerarLink(){
   const t = tituloInput.value.trim();
   const c = canalLinkInput.value.trim();
   const d = downloadLinkInput.value.trim();
@@ -89,20 +89,15 @@ async function gerarLink(){
     "&canalLink=" + encodeURIComponent(c) +
     "&downloadLink=" + encodeURIComponent(d);
 
-  try{
-    const resp = await fetch(
-      "https://is.gd/create.php?format=simple&url=" +
-      encodeURIComponent(urlLonga)
-    );
+  const encurtador =
+    "https://is.gd/create.php?format=simple&url=" +
+    encodeURIComponent(urlLonga);
 
-    const urlCurta = await resp.text();
+  // abre em nova aba e já copia
+  window.open(encurtador, "_blank");
 
-    navigator.clipboard.writeText(urlCurta);
-    alert("✅ Link curto copiado:\n\n" + urlCurta);
-
-  }catch(e){
-    alert("Erro ao gerar link curto");
-  }
+  navigator.clipboard.writeText(encurtador);
+  alert("✅ Link do is.gd aberto.\nCopie o link curto exibido.");
 }
 
 // Partículas
