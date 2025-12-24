@@ -55,12 +55,10 @@ button:hover{background:var(--primary-hover)}
 </div>
 
 <script>
-// 🔑 SUA API DO TINYURL (como você pediu)
-const TINYURL_API_TOKEN = "2zYuBCZsmnRmtpGCXLG1RBVv0R6IxCv3kKbaORqJP3rAonEw1q86SPY3wpM8";
-
 // Título animado
 const texto = "Ganhe Seguidores redes social";
 let i = 0, apag = false;
+
 function animar(){
   tituloAnimado.textContent = texto.slice(0, i);
   if(!apag && i < texto.length){
@@ -73,6 +71,7 @@ function animar(){
 }
 animar();
 
+// GERAR LINK + ENCURTAR (is.gd – funciona no GitHub Pages)
 async function gerarLink(){
   const t = tituloInput.value.trim();
   const c = canalLinkInput.value.trim();
@@ -91,34 +90,22 @@ async function gerarLink(){
     "&downloadLink=" + encodeURIComponent(d);
 
   try{
-    const resp = await fetch("https://api.tinyurl.com/create", {
-      method: "POST",
-      headers: {
-        "Authorization": "Bearer " + TINYURL_API_TOKEN,
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        url: urlLonga,
-        domain: "tinyurl.com"
-      })
-    });
+    const resp = await fetch(
+      "https://is.gd/create.php?format=simple&url=" +
+      encodeURIComponent(urlLonga)
+    );
 
-    const data = await resp.json();
+    const urlCurta = await resp.text();
 
-    if(!data.data || !data.data.tiny_url){
-      alert("Erro ao encurtar link");
-      return;
-    }
+    navigator.clipboard.writeText(urlCurta);
+    alert("✅ Link curto copiado:\n\n" + urlCurta);
 
-    navigator.clipboard.writeText(data.data.tiny_url);
-    alert("✅ Link curto copiado:\n\n" + data.data.tiny_url);
-
-  }catch(err){
-    console.error(err);
-    alert("Erro na API do TinyURL");
+  }catch(e){
+    alert("Erro ao gerar link curto");
   }
 }
 
+// Partículas
 particlesJS("zyzz-particles",{
   particles:{
     number:{value:80},
@@ -128,5 +115,6 @@ particlesJS("zyzz-particles",{
   }
 });
 </script>
+
 </body>
 </html>
