@@ -7,55 +7,126 @@
 
 <style>
 body{
-  margin:0;background:#000;color:#fff;font-family:Arial;text-align:center
+  margin:0;
+  background:#000;
+  color:#fff;
+  font-family:Arial, Helvetica, sans-serif;
+  text-align:center;
 }
 .container{padding:20px}
-.progress-bar{height:10px;background:#222;border-radius:5px;overflow:hidden}
-#progress{height:100%;width:0;background:lime;transition:.4s}
-button,a{
-  display:block;margin:10px auto;padding:14px;border-radius:6px;
-  text-decoration:none;font-weight:bold;width:100%;max-width:400px
+.progress-bar{
+  height:10px;
+  background:#222;
+  border-radius:5px;
+  overflow:hidden;
+  margin:20px 0;
 }
-.visit{background:#007bff;color:#fff}
-.confirm{background:#444;color:#fff;opacity:.6}
-.confirm.active{background:green;opacity:1}
-#download{display:none;background:green;color:#fff}
+#progress{
+  height:100%;
+  width:0%;
+  background:lime;
+  transition:width .4s;
+}
+button,a{
+  display:block;
+  margin:12px auto;
+  padding:14px;
+  border-radius:6px;
+  text-decoration:none;
+  font-weight:bold;
+  width:100%;
+  max-width:400px;
+  border:none;
+  cursor:pointer;
+}
+.visit{
+  background:#007bff;
+  color:#fff;
+}
+.confirm{
+  background:#444;
+  color:#fff;
+  opacity:.6;
+}
+.confirm.active{
+  background:green;
+  opacity:1;
+}
+#download{
+  display:none;
+  background:green;
+  color:#fff;
+}
 </style>
 </head>
 
 <body>
 <div class="container">
-<h1 id="titulo"></h1>
 
-<div class="progress-bar"><div id="progress"></div></div>
+<h1 id="titulo">Concluir tarefa</h1>
+
+<div class="progress-bar">
+  <div id="progress"></div>
+</div>
 
 <button class="visit" onclick="abrir()">🔗 Visitar página</button>
 <button id="confirm" class="confirm" disabled onclick="finalizar()">✅ Já visitei</button>
 
 <a id="download" target="_blank">📥 Baixar Agora</a>
+
 </div>
 
 <script>
-const p=new URLSearchParams(location.search);
-titulo.textContent=p.get("titulo");
-const canal=p.get("canalLink");
-const download=p.get("downloadLink");
+const params = new URLSearchParams(window.location.search);
+
+document.getElementById("titulo").textContent =
+  params.get("titulo") || "Concluir tarefa";
+
+const canalLink = params.get("canalLink");
+const downloadLink = params.get("downloadLink");
+
+let saiuEm = null;
+const tempoMinimo = 10; // segundos fora da aba
+
+const btnConfirm = document.getElementById("confirm");
+const progress = document.getElementById("progress");
+const download = document.getElementById("download");
 
 function abrir(){
-  open(canal,"_blank");
-  confirm.disabled=true;
-  confirm.classList.remove("active");
-  setTimeout(()=>{
-    confirm.disabled=false;
-    confirm.classList.add("active");
-  },10000);
+  if(!canalLink){
+    alert("Link inválido.");
+    return;
+  }
+
+  saiuEm = Date.now();
+  window.open(canalLink, "_blank");
+
+  btnConfirm.disabled = true;
+  btnConfirm.classList.remove("active");
 }
 
+document.addEventListener("visibilitychange", () => {
+  if (document.visibilityState === "visible" && saiuEm) {
+    const tempoFora = (Date.now() - saiuEm) / 1000;
+
+    if (tempoFora >= tempoMinimo) {
+      btnConfirm.disabled = false;
+      btnConfirm.classList.add("active");
+      progress.style.width = "100%";
+    }
+  }
+});
+
 function finalizar(){
-  progress.style.width="100%";
-  download.href=download;
-  download.style.display="block";
+  if(!downloadLink){
+    alert("Download não disponível.");
+    return;
+  }
+
+  download.href = downloadLink;
+  download.style.display = "block";
 }
 </script>
+
 </body>
 </html>
