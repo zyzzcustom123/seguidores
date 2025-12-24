@@ -8,70 +8,38 @@
 <script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
 
 <style>
-:root { color-scheme: light dark; }
-.zyzz-page{
-  --bg:#fff;--text:#111;--muted:#f5f5f7;--muted-border:#d0d0d0;
-  --primary:#0d6efd;--primary-hover:#0b5ed7;
-  min-height:100vh;padding:60px 16px;background:var(--bg);color:var(--text);
-  font-family:Arial,sans-serif;position:relative
+:root{color-scheme:light dark}
+body{
+  margin:0;font-family:Arial,sans-serif;background:#000;color:#fff
 }
-@media(prefers-color-scheme:dark){
-  .zyzz-page{
-    --bg:#000;--text:#fff;--muted:#222;--muted-border:#555;
-    --primary:#e31b23;--primary-hover:#b2171d
-  }
-}
-#zyzz-particles{position:absolute;inset:0}
 .container{
-  position:relative;z-index:1;max-width:500px;margin:auto;
-  display:flex;flex-direction:column;gap:12px;text-align:center
+  min-height:100vh;display:flex;flex-direction:column;
+  justify-content:center;align-items:center;gap:12px;padding:20px
 }
-h1{font-size:clamp(28px,6vw,42px)}
 input,button{
-  padding:14px;border-radius:8px;font-size:1.05em;width:100%
+  width:100%;max-width:420px;padding:14px;
+  border-radius:8px;border:none;font-size:1em
 }
-input{background:var(--muted);border:1px solid var(--muted-border)}
+input{background:#222;color:#fff}
 button{
-  background:var(--primary);color:#fff;border:none;
-  font-weight:bold;cursor:pointer
+  background:#e31b23;color:#fff;font-weight:bold;cursor:pointer
 }
-button:hover{background:var(--primary-hover)}
+button:hover{opacity:.9}
 </style>
 </head>
 
 <body>
-<div class="zyzz-page">
-  <div id="zyzz-particles"></div>
+<div class="container">
+  <h1>Gerar Link Curto</h1>
 
-  <div class="container">
-    <h1 id="tituloAnimado"></h1>
+  <input id="tituloInput" placeholder="Título">
+  <input id="canalLinkInput" placeholder="Link da página (YouTube etc)">
+  <input id="downloadLinkInput" placeholder="Link do download">
 
-    <input id="tituloInput" placeholder="Digite o título">
-    <input id="canalLinkInput" placeholder="Link da página">
-    <input id="downloadLinkInput" placeholder="Link do download">
-
-    <button onclick="gerarLink()">Gerar URL Curta ✅</button>
-  </div>
+  <button onclick="gerarLink()">Gerar link ✅</button>
 </div>
 
 <script>
-// Título animado
-const texto = "Ganhe Seguidores redes social";
-let i = 0, apag = false;
-
-function animar(){
-  tituloAnimado.textContent = texto.slice(0, i);
-  if(!apag && i < texto.length){
-    i++; setTimeout(animar, 120);
-  } else if(apag && i > 0){
-    i--; setTimeout(animar, 80);
-  } else {
-    apag = !apag; setTimeout(animar, 800);
-  }
-}
-animar();
-
-// GERAR LINK SEM CORS (is.gd)
 function gerarLink(){
   const t = tituloInput.value.trim();
   const c = canalLinkInput.value.trim();
@@ -82,34 +50,23 @@ function gerarLink(){
     return;
   }
 
-  const urlLonga =
+  // LINK GRANDE
+  const linkGrande =
     location.origin +
     location.pathname.replace("index.html","") +
     "concluir.html?titulo=" + encodeURIComponent(t) +
     "&canalLink=" + encodeURIComponent(c) +
     "&downloadLink=" + encodeURIComponent(d);
 
-  const encurtador =
-    "https://is.gd/create.php?format=simple&url=" +
-    encodeURIComponent(urlLonga);
+  // LINK CURTO COM /go
+  const linkCurto =
+    location.origin +
+    location.pathname.replace("index.html","") +
+    "go/?to=" + encodeURIComponent(linkGrande);
 
-  // abre em nova aba e já copia
-  window.open(encurtador, "_blank");
-
-  navigator.clipboard.writeText(encurtador);
-  alert("✅ Link do is.gd aberto.\nCopie o link curto exibido.");
+  navigator.clipboard.writeText(linkCurto);
+  alert("✅ Link curto copiado:\n\n" + linkCurto);
 }
-
-// Partículas
-particlesJS("zyzz-particles",{
-  particles:{
-    number:{value:80},
-    color:{value:"#e31b23"},
-    line_linked:{enable:true,color:"#e31b23"},
-    move:{enable:true,speed:2}
-  }
-});
 </script>
-
 </body>
 </html>
