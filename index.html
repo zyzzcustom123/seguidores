@@ -46,11 +46,14 @@ button:hover{background:var(--primary-hover)}
 <input id="canalLinkInput" placeholder="Link da página">
 <input id="downloadLinkInput" placeholder="Link do download">
 
-<button onclick="gerarLink()">Gerar URL ✅</button>
+<button onclick="gerarLink()">Gerar URL Curta ✅</button>
 </div>
 </div>
 
 <script>
+// ⚠️ COLOQUE ISSO EM BACKEND NO FUTURO
+const TINYURL_API_TOKEN = "COLE_SUA_API_KEY_AQUI";
+
 const texto="Ganhe Seguidores redes social";
 let i=0,apag=false;
 function animar(){
@@ -61,19 +64,48 @@ function animar(){
 }
 animar();
 
-function gerarLink(){
-  const t=tituloInput.value.trim();
-  const c=canalLinkInput.value.trim();
-  const d=downloadLinkInput.value.trim();
-  if(!t||!c||!d){alert("Preencha tudo");return;}
+async function gerarLink(){
+  const t = tituloInput.value.trim();
+  const c = canalLinkInput.value.trim();
+  const d = downloadLinkInput.value.trim();
 
-  const url = location.origin + location.pathname.replace("index.html","")
-    + "concluir.html?titulo="+encodeURIComponent(t)
-    +"&canalLink="+encodeURIComponent(c)
-    +"&downloadLink="+encodeURIComponent(d);
+  if(!t || !c || !d){
+    alert("Preencha todos os campos");
+    return;
+  }
 
-  navigator.clipboard.writeText(url);
-  alert("URL copiada!");
+  const urlLonga =
+    location.origin + location.pathname.replace("index.html","") +
+    "concluir.html?titulo="+encodeURIComponent(t)+
+    "&canalLink="+encodeURIComponent(c)+
+    "&downloadLink="+encodeURIComponent(d);
+
+  try{
+    const resp = await fetch("https://api.tinyurl.com/create",{
+      method:"POST",
+      headers:{
+        "Authorization":"Bearer " + TINYURL_API_TOKEN,
+        "Content-Type":"application/json"
+      },
+      body:JSON.stringify({
+        url: urlLonga,
+        domain: "tinyurl.com"
+      })
+    });
+
+    const data = await resp.json();
+
+    if(!data.data || !data.data.tiny_url){
+      throw "Erro ao encurtar";
+    }
+
+    navigator.clipboard.writeText(data.data.tiny_url);
+    alert("Link curto copiado:\n" + data.data.tiny_url);
+
+  }catch(e){
+    console.error(e);
+    alert("Erro ao gerar link curto");
+  }
 }
 
 particlesJS("zyzz-particles",{
