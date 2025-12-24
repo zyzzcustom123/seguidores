@@ -2,131 +2,85 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Concluir Etapas</title>
+<title>Crescer Redes Sociais</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<script src="https://cdn.jsdelivr.net/particles.js/2.0.0/particles.min.js"></script>
+
 <style>
-body{
-  margin:0;
-  background:#000;
-  color:#fff;
-  font-family:Arial, Helvetica, sans-serif;
-  text-align:center;
+:root { color-scheme: light dark; }
+.zyzz-page{
+  --bg:#fff;--text:#111;--muted:#f5f5f7;--muted-border:#d0d0d0;
+  --primary:#0d6efd;--primary-hover:#0b5ed7;--accent:#e31b23;
+  min-height:100vh;padding:60px 16px;background:var(--bg);color:var(--text);
+  font-family:Arial,sans-serif;position:relative
 }
-.container{padding:20px}
-.progress-bar{
-  height:10px;
-  background:#222;
-  border-radius:5px;
-  overflow:hidden;
-  margin:20px 0;
+@media(prefers-color-scheme:dark){
+  .zyzz-page{--bg:#000;--text:#fff;--muted:#222;--muted-border:#555;--primary:#e31b23;--primary-hover:#b2171d}
 }
-#progress{
-  height:100%;
-  width:0%;
-  background:lime;
-  transition:width .4s;
+#zyzz-particles{position:absolute;inset:0}
+.container{
+  position:relative;z-index:1;max-width:500px;margin:auto;
+  display:flex;flex-direction:column;gap:12px;text-align:center
 }
-button,a{
-  display:block;
-  margin:12px auto;
-  padding:14px;
-  border-radius:6px;
-  text-decoration:none;
-  font-weight:bold;
-  width:100%;
-  max-width:400px;
-  border:none;
-  cursor:pointer;
+h1{font-size:clamp(28px,6vw,42px)}
+input,button{
+  padding:14px;border-radius:8px;font-size:1.05em;width:100%
 }
-.visit{
-  background:#007bff;
-  color:#fff;
+input{background:var(--muted);border:1px solid var(--muted-border)}
+button{
+  background:var(--primary);color:#fff;border:none;font-weight:bold;cursor:pointer
 }
-.confirm{
-  background:#444;
-  color:#fff;
-  opacity:.6;
-}
-.confirm.active{
-  background:green;
-  opacity:1;
-}
-#download{
-  display:none;
-  background:green;
-  color:#fff;
-}
+button:hover{background:var(--primary-hover)}
 </style>
 </head>
 
 <body>
+<div class="zyzz-page">
+<div id="zyzz-particles"></div>
+
 <div class="container">
+<h1 id="tituloAnimado"></h1>
 
-<h1 id="titulo">Concluir tarefa</h1>
+<input id="tituloInput" placeholder="Digite o título">
+<input id="canalLinkInput" placeholder="Link da página">
+<input id="downloadLinkInput" placeholder="Link do download">
 
-<div class="progress-bar">
-  <div id="progress"></div>
+<button onclick="gerarLink()">Gerar URL ✅</button>
 </div>
-
-<button class="visit" onclick="abrir()">?? Visitar página</button>
-<button id="confirm" class="confirm" disabled onclick="finalizar()">? Já visitei</button>
-
-<a id="download" target="_blank">?? Baixar Agora</a>
-
 </div>
 
 <script>
-const params = new URLSearchParams(window.location.search);
+const texto="Ganhe Seguidores redes social";
+let i=0,apag=false;
+function animar(){
+  tituloAnimado.textContent=texto.slice(0,i);
+  if(!apag&&i<texto.length){i++;setTimeout(animar,120)}
+  else if(apag&&i>0){i--;setTimeout(animar,80)}
+  else{apag=!apag;setTimeout(animar,800)}
+}
+animar();
 
-document.getElementById("titulo").textContent =
-  params.get("titulo") || "Concluir tarefa";
+function gerarLink(){
+  const t=tituloInput.value.trim();
+  const c=canalLinkInput.value.trim();
+  const d=downloadLinkInput.value.trim();
+  if(!t||!c||!d){alert("Preencha tudo");return;}
 
-const canalLink = params.get("canalLink");
-const downloadLink = params.get("downloadLink");
+  const url = location.origin + location.pathname.replace("index.html","")
+    + "concluir.html?titulo="+encodeURIComponent(t)
+    +"&canalLink="+encodeURIComponent(c)
+    +"&downloadLink="+encodeURIComponent(d);
 
-let saiuEm = null;
-const tempoMinimo = 10; // segundos fora da aba
-
-const btnConfirm = document.getElementById("confirm");
-const progress = document.getElementById("progress");
-const download = document.getElementById("download");
-
-function abrir(){
-  if(!canalLink){
-    alert("Link inválido.");
-    return;
-  }
-
-  saiuEm = Date.now();
-  window.open(canalLink, "_blank");
-
-  btnConfirm.disabled = true;
-  btnConfirm.classList.remove("active");
+  navigator.clipboard.writeText(url);
+  alert("URL copiada!");
 }
 
-document.addEventListener("visibilitychange", () => {
-  if (document.visibilityState === "visible" && saiuEm) {
-    const tempoFora = (Date.now() - saiuEm) / 1000;
-
-    if (tempoFora >= tempoMinimo) {
-      btnConfirm.disabled = false;
-      btnConfirm.classList.add("active");
-      progress.style.width = "100%";
-    }
-  }
+particlesJS("zyzz-particles",{
+  particles:{number:{value:80},color:{value:"#e31b23"},
+  line_linked:{enable:true,color:"#e31b23"},
+  move:{enable:true,speed:2}}
 });
-
-function finalizar(){
-  if(!downloadLink){
-    alert("Download não disponível.");
-    return;
-  }
-
-  download.href = downloadLink;
-  download.style.display = "block";
-}
 </script>
-
 </body>
 </html>
